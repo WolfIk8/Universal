@@ -6,6 +6,7 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "CustomLightingGui"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
+gui.DisplayOrder = 10000000
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local panel = Instance.new("Frame")
@@ -15,11 +16,15 @@ panel.Position = UDim2.new(0.5, 0, 0.5, 0)
 panel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 panel.BorderSizePixel = 0
 panel.Visible = true
+panel.ZIndex = 1
 panel.Parent = gui
 
 local panelCorner = Instance.new("UICorner")
 panelCorner.CornerRadius = UDim.new(0, 12)
 panelCorner.Parent = panel
+
+panel.Active = true
+panel.Draggable = true
 
 local fbButton = Instance.new("TextButton")
 fbButton.Size = UDim2.new(0, 120, 0, 38)
@@ -87,8 +92,10 @@ fbButton.MouseButton1Click:Connect(function()
         local b = tonumber(brightnessBox.Text)
         if b then
             Lighting.Brightness = b
+            fbButton.Text = "FullBright ON"
+        else
+            fbEnabled = false
         end
-        fbButton.Text = "FullBright ON"
     else
         Lighting.Brightness = originalBrightness
         fbButton.Text = "FullBright OFF"
