@@ -1,0 +1,132 @@
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local player = Players.LocalPlayer
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "CustomLightingGui"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- -----------------------
+-- Панель с кнопками
+-- -----------------------
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0, 280, 0, 115) -- меньше и без лишнего пространства
+panel.AnchorPoint = Vector2.new(0.5, 0.5)
+panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+panel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+panel.BorderSizePixel = 0
+panel.Visible = true
+panel.Parent = gui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0, 12)
+panelCorner.Parent = panel
+
+-- FullBright Button
+local fbButton = Instance.new("TextButton")
+fbButton.Size = UDim2.new(0, 120, 0, 38)
+fbButton.Position = UDim2.new(0, 15, 0, 15)
+fbButton.BackgroundColor3 = Color3.fromRGB(50,50,50)
+fbButton.TextColor3 = Color3.fromRGB(230,230,230)
+fbButton.Text = "FullBright OFF"
+fbButton.Parent = panel
+
+local fbCorner = Instance.new("UICorner")
+fbCorner.CornerRadius = UDim.new(0, 8)
+fbCorner.Parent = fbButton
+
+-- Remove Fog Button
+local fogButton = Instance.new("TextButton")
+fogButton.Size = UDim2.new(0, 120, 0, 38)
+fogButton.Position = UDim2.new(0, 145, 0, 15)
+fogButton.BackgroundColor3 = Color3.fromRGB(50,50,50)
+fogButton.TextColor3 = Color3.fromRGB(230,230,230)
+fogButton.Text = "Remove Fog OFF"
+fogButton.Parent = panel
+
+local fogCorner = Instance.new("UICorner")
+fogCorner.CornerRadius = UDim.new(0, 8)
+fogCorner.Parent = fogButton
+
+-- TextBox (теперь ровно по ширине линии кнопок)
+local brightnessBox = Instance.new("TextBox")
+brightnessBox.Size = UDim2.new(0, 250, 0, 30) -- 15 + 250 + 15 = 280 (ровно ширина панели)
+brightnessBox.Position = UDim2.new(0, 15, 0, 65)
+brightnessBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+brightnessBox.TextColor3 = Color3.fromRGB(230,230,230)
+brightnessBox.Text = ""
+brightnessBox.PlaceholderText = "Brightness"
+brightnessBox.ClearTextOnFocus = false
+brightnessBox.Parent = panel
+
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 8)
+boxCorner.Parent = brightnessBox
+
+-- -----------------------
+-- Toggle Button
+-- -----------------------
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 90, 0, 35)
+toggleButton.AnchorPoint = Vector2.new(0, 0.5)
+toggleButton.Position = UDim2.new(0.5, 160, 0.5, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(50,50,50)
+toggleButton.TextColor3 = Color3.fromRGB(230,230,230)
+toggleButton.Text = "Toggle"
+toggleButton.Parent = gui
+toggleButton.ZIndex = 10
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 8)
+toggleCorner.Parent = toggleButton
+
+toggleButton.Active = true
+toggleButton.Draggable = true
+
+-- -----------------------
+-- Логика (НЕ ТРОГАЛ)
+-- -----------------------
+local fbEnabled = false
+local fogEnabled = false
+local originalBrightness = Lighting.Brightness
+local originalFogEnd = Lighting.FogEnd
+
+fbButton.MouseButton1Click:Connect(function()
+    fbEnabled = not fbEnabled
+    if fbEnabled then
+        local b = tonumber(brightnessBox.Text)
+if b then
+    Lighting.Brightness = b
+end
+        fbButton.Text = "FullBright ON"
+    else
+        Lighting.Brightness = originalBrightness
+        fbButton.Text = "FullBright OFF"
+    end
+end)
+
+fogButton.MouseButton1Click:Connect(function()
+    fogEnabled = not fogEnabled
+    if fogEnabled then
+        originalFogEnd = Lighting.FogEnd
+        Lighting.FogEnd = 1000000
+        fogButton.Text = "Remove Fog ON"
+    else
+        Lighting.FogEnd = originalFogEnd
+        fogButton.Text = "Remove Fog OFF"
+    end
+end)
+
+brightnessBox.FocusLost:Connect(function()
+    local b = tonumber(brightnessBox.Text)
+    if b and fbEnabled then
+        Lighting.Brightness = b
+    end
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+    panel.Visible = not panel.Visible
+end)
