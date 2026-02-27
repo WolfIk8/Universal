@@ -11,7 +11,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 -- Панель
 local panel = Instance.new("Frame")
-panel.Size = UDim2.new(0, 340, 0, 240) -- увеличена ширина и высота
+panel.Size = UDim2.new(0, 420, 0, 160) -- увеличена ширина и высота
 panel.AnchorPoint = Vector2.new(0.5, 0.5)
 panel.Position = UDim2.new(0.5, 0, 0.5, 0)
 panel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
@@ -29,7 +29,7 @@ panel.Draggable = true
 
 -- TextBox для Place ID
 local placeBox = Instance.new("TextBox")
-placeBox.Size = UDim2.new(0, 310, 0, 30)
+placeBox.Size = UDim2.new(0, 390, 0, 30)
 placeBox.Position = UDim2.new(0, 15, 0, 15)
 placeBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
 placeBox.TextColor3 = Color3.fromRGB(230,230,230)
@@ -43,7 +43,7 @@ placeCorner.Parent = placeBox
 
 -- TextBox для Job ID
 local jobBox = Instance.new("TextBox")
-jobBox.Size = UDim2.new(0, 310, 0, 30)
+jobBox.Size = UDim2.new(0, 390, 0, 30)
 jobBox.Position = UDim2.new(0, 15, 0, 60)
 jobBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
 jobBox.TextColor3 = Color3.fromRGB(230,230,230)
@@ -74,7 +74,7 @@ end
 local copyPlaceBtn = createButton("Copy Place ID", 15, 110)
 local copyJobBtn = createButton("Copy Job ID", 115, 110)
 local joinBtn = createButton("Join", 215, 110)
-local rejoinBtn = createButton("Rejoin", 115, 160) -- новая кнопка под остальными
+local rejoinBtn = createButton("Rejoin", 315, 110) -- новая кнопка под остальными
 
 -- Toggle кнопка
 local toggleButton = Instance.new("TextButton")
