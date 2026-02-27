@@ -102,14 +102,35 @@ fbButton.MouseButton1Click:Connect(function()
     end
 end)
 
+local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
+
+local originalDensity
+local originalHaze
+
 fogButton.MouseButton1Click:Connect(function()
     fogEnabled = not fogEnabled
+
     if fogEnabled then
         originalFogEnd = Lighting.FogEnd
         Lighting.FogEnd = 1000000
+
+        if atmosphere then
+            originalDensity = atmosphere.Density
+            originalHaze = atmosphere.Haze
+
+            atmosphere.Density = 0
+            atmosphere.Haze = 0
+        end
+
         fogButton.Text = "Remove Fog ON"
     else
         Lighting.FogEnd = originalFogEnd
+
+        if atmosphere then
+            atmosphere.Density = originalDensity
+            atmosphere.Haze = originalHaze
+        end
+
         fogButton.Text = "Remove Fog OFF"
     end
 end)
