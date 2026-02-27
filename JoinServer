@@ -93,13 +93,11 @@ toggleButton.MouseButton1Click:Connect(function()
 end)
 
 copyPlaceBtn.MouseButton1Click:Connect(function()
-    placeBox.Text = tostring(game.PlaceId)
-    setclipboard(placeBox.Text)
+    setclipboard(tostring(game.PlaceId))
 end)
 
 copyJobBtn.MouseButton1Click:Connect(function()
-    jobBox.Text = game.JobId
-    setclipboard(jobBox.Text)
+    setclipboard(game.JobId)
 end)
 
 joinBtn.MouseButton1Click:Connect(function()
