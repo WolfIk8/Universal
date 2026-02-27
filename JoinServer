@@ -1,0 +1,120 @@
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ServerJoinGui"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 10000000
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Панель
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0, 340, 0, 240) -- увеличена ширина и высота
+panel.AnchorPoint = Vector2.new(0.5, 0.5)
+panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+panel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+panel.BorderSizePixel = 0
+panel.Visible = true
+panel.ZIndex = 1
+panel.Parent = gui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0, 12)
+panelCorner.Parent = panel
+
+panel.Active = true
+panel.Draggable = true
+
+-- TextBox для Place ID
+local placeBox = Instance.new("TextBox")
+placeBox.Size = UDim2.new(0, 310, 0, 30)
+placeBox.Position = UDim2.new(0, 15, 0, 15)
+placeBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+placeBox.TextColor3 = Color3.fromRGB(230,230,230)
+placeBox.PlaceholderText = "Place ID"
+placeBox.ClearTextOnFocus = false
+placeBox.Parent = panel
+
+local placeCorner = Instance.new("UICorner")
+placeCorner.CornerRadius = UDim.new(0, 8)
+placeCorner.Parent = placeBox
+
+-- TextBox для Job ID
+local jobBox = Instance.new("TextBox")
+jobBox.Size = UDim2.new(0, 310, 0, 30)
+jobBox.Position = UDim2.new(0, 15, 0, 60)
+jobBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+jobBox.TextColor3 = Color3.fromRGB(230,230,230)
+jobBox.PlaceholderText = "Job ID"
+jobBox.ClearTextOnFocus = false
+jobBox.Parent = panel
+
+local jobCorner = Instance.new("UICorner")
+jobCorner.CornerRadius = UDim.new(0, 8)
+jobCorner.Parent = jobBox
+
+-- Функция для создания кнопок
+local function createButton(text, posX, posY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 90, 0, 35)
+    btn.Position = UDim2.new(0, posX, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    btn.TextColor3 = Color3.fromRGB(230,230,230)
+    btn.Text = text
+    btn.Parent = panel
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+    return btn
+end
+
+-- Кнопки
+local copyPlaceBtn = createButton("Copy Place ID", 15, 110)
+local copyJobBtn = createButton("Copy Job ID", 115, 110)
+local joinBtn = createButton("Join", 215, 110)
+local rejoinBtn = createButton("Rejoin", 115, 160) -- новая кнопка под остальными
+
+-- Toggle кнопка
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 90, 0, 35)
+toggleButton.AnchorPoint = Vector2.new(0, 0.5)
+toggleButton.Position = UDim2.new(0.5, 160, 0.5, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(50,50,50)
+toggleButton.TextColor3 = Color3.fromRGB(230,230,230)
+toggleButton.Text = "Toggle"
+toggleButton.Parent = gui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 8)
+toggleCorner.Parent = toggleButton
+toggleButton.Active = true
+toggleButton.Draggable = true
+
+toggleButton.MouseButton1Click:Connect(function()
+    panel.Visible = not panel.Visible
+end)
+
+-- Функционал кнопок
+copyPlaceBtn.MouseButton1Click:Connect(function()
+    placeBox.Text = tostring(game.PlaceId)
+    setclipboard(placeBox.Text)
+end)
+
+copyJobBtn.MouseButton1Click:Connect(function()
+    jobBox.Text = game.JobId
+    setclipboard(jobBox.Text)
+end)
+
+joinBtn.MouseButton1Click:Connect(function()
+    local targetPlace = tonumber(placeBox.Text) or game.PlaceId
+    local targetJob = jobBox.Text
+    if targetJob and targetJob ~= "" then
+        TeleportService:TeleportToPlaceInstance(targetPlace, targetJob, player)
+    end
+end)
+
+rejoinBtn.MouseButton1Click:Connect(function()
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+end)
