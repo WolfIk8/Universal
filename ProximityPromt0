@@ -1,0 +1,16 @@
+local Workspace = game:GetService("Workspace")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local function makeInstant(prompt)
+    if prompt:IsA("ProximityPrompt") then
+        prompt.HoldDuration = 0
+    end
+end
+for _, prompt in ipairs(Workspace:GetDescendants()) do
+    makeInstant(prompt)
+end
+Workspace.DescendantAdded:Connect(function(descendant)
+    makeInstant(descendant)
+end)
+ProximityPromptService.PromptShown:Connect(function(prompt)
+    makeInstant(prompt)
+end)
