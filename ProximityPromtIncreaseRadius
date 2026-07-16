@@ -1,0 +1,142 @@
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+
+if CoreGui:FindFirstChild("PromptExpanderGui") then
+    CoreGui.PromptExpanderGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PromptExpanderGui"
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 180, 0, 110)
+MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 8)
+Corner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 25)
+Title.BackgroundTransparency = 1
+Title.Text = "Prompt Expander"
+Title.TextColor3 = Color3.fromRGB(240, 240, 240)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 14
+Title.Parent = MainFrame
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0.9, 0, 0, 30)
+TextBox.Position = UDim2.new(0.05, 0, 0.28, 0)
+TextBox.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+TextBox.BorderSizePixel = 0
+TextBox.Text = ""
+TextBox.PlaceholderText = "Studs to add (e.g. 15)"
+TextBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.Font = Enum.Font.SourceSans
+TextBox.TextSize = 14
+TextBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 5)
+BoxCorner.Parent = TextBox
+
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0.9, 0, 0, 30)
+ToggleBtn.Position = UDim2.new(0.05, 0, 0.62, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+ToggleBtn.BorderSizePixel = 0
+ToggleBtn.Text = "Disabled"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Font = Enum.Font.SourceSansBold
+ToggleBtn.TextSize = 14
+ToggleBtn.Parent = MainFrame
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 5)
+BtnCorner.Parent = ToggleBtn
+
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+local enabled = false
+local originalDistances = {}
+
+local function applyToPrompt(prompt, addedValue)
+    if not prompt:IsA("ProximityPrompt") then return end
+    if not originalDistances[prompt] then
+        originalDistances[prompt] = prompt.MaxActivationDistance
+    end
+    prompt.MaxActivationDistance = originalDistances[prompt] + addedValue
+end
+
+local function restorePrompt(prompt)
+    if not prompt:IsA("ProximityPrompt") then return end
+    if originalDistances[prompt] then
+        prompt.MaxActivationDistance = originalDistances[prompt]
+        originalDistances[prompt] = nil
+    end
+end
+
+local function toggle(state)
+    enabled = state
+    if enabled then
+        local addedValue = tonumber(TextBox.Text) or 0
+        ToggleBtn.Text = "Enabled"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 160, 50)
+        for _, descendant in ipairs(Workspace:GetDescendants()) do
+            applyToPrompt(descendant, addedValue)
+        end
+    else
+        ToggleBtn.Text = "Disabled"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        for prompt, _ in pairs(originalDistances) do
+            if prompt and prompt.Parent then
+                restorePrompt(prompt)
+            end
+        end
+        table.clear(originalDistances)
+    end
+end
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    toggle(not enabled)
+end)
+
+Workspace.DescendantAdded:Connect(function(descendant)
+    if enabled then
+        local addedValue = tonumber(TextBox.Text) or 0
+        applyToPrompt(descendant, addedValue)
+    end
+end)
