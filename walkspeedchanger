@@ -1,37 +1,35 @@
--- Создание GUI
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local UICorner = Instance.new("UICorner")
 local TextBox = Instance.new("TextBox")
 local UICorner_2 = Instance.new("UICorner")
 local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local ToggleButton = Instance.new("TextButton")
+local UICorner_3 = Instance.new("UICorner")
 
--- Настройка контейнера GUI (защита от удаления при смерти)
-ScreenGui.Name = "SpeedFixerGUI"
-ScreenGui.Parent = game:GetService("CoreGui") -- Используем CoreGui для экзекуторов
+ScreenGui.Name = "SpeedChangerGUI"
+ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
--- Главная панель (красивый темный дизайн)
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.5, -100, 0.4, -25) -- По центру экрана
+MainFrame.Position = UDim2.new(0.5, -100, 0.4, -25)
 MainFrame.Size = UDim2.new(0, 200, 0, 50)
 MainFrame.Active = true
-MainFrame.Draggable = true -- Можно двигать по экрану
+MainFrame.Draggable = true
 
 UICorner.CornerRadius = UDim.new(0, 8)
 UICorner.Parent = MainFrame
 
--- Текстовое поле
 TextBox.Parent = MainFrame
 TextBox.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 TextBox.BorderSizePixel = 0
 TextBox.Position = UDim2.new(0.05, 0, 0.15, 0)
 TextBox.Size = UDim2.new(0.9, 0, 0.7, 0)
 TextBox.Font = Enum.Font.GothamBold
-TextBox.PlaceholderText = "Введите скорость..."
+TextBox.PlaceholderText = "enter speed..."
 TextBox.Text = ""
 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextBox.TextSize = 14
@@ -43,14 +41,28 @@ UICorner_2.Parent = TextBox
 UITextSizeConstraint.Parent = TextBox
 UITextSizeConstraint.MaxTextSize = 16
 
---- Логика фиксации скорости ---
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Position = UDim2.new(0.5, -30, 0.05, 0)
+ToggleButton.Size = UDim2.new(0, 60, 0, 20)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Text = "toggle"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 10
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+UICorner_3.CornerRadius = UDim.new(0, 4)
+UICorner_3.Parent = ToggleButton
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
-local targetSpeed = nil -- Переменная для хранения установленной скорости
+local targetSpeed = nil
 
--- Поток, который жестко фиксирует скорость каждый кадр
 RunService.RenderStepped:Connect(function()
     if targetSpeed then
         local character = LocalPlayer.Character
@@ -63,19 +75,20 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Слушатель изменения текста в поле
 TextBox:GetPropertyChangedSignal("Text"):Connect(function()
     local text = TextBox.Text
     
     if text == "" then
-        targetSpeed = nil -- Если пусто, отключаем фиксацию (возвращается стандартная скорость игры)
+        targetSpeed = nil
         return
     end
     
     local number = tonumber(text)
     if number then
-        targetSpeed = number -- Если ввели число, фиксируем его
-    else
-        -- Если ввели буквы, то ничего не делаем (сохраняется последняя валидная скорость)
+        targetSpeed = number
     end
+end)
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
 end)
